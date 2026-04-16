@@ -22,5 +22,7 @@ namespace RPCMAS.Core.Entities
         public string ReasonOrJustification { get; set; }
 
         public RequestStatusEnum Status { get; set; }
+
+        public List<PriceChangeRequestDetailModel> Details { get; set; } = new();
     }
 }

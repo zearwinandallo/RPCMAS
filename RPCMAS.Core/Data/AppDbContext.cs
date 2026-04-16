@@ -18,5 +18,16 @@ namespace RPCMAS.Core.Data
         public DbSet<ItemCatalogModel> ItemCatalogs { get; set; }
         public DbSet<PriceChangeRequestDetailModel> PriceChangeRequestDetails { get; set; }
         public DbSet<PriceChangeRequestHeaderModel> PriceChangeRequestHeaders { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<PriceChangeRequestDetailModel>()
+                .HasOne(d => d.PriceChangeRequestHeader)
+                .WithMany(h => h.Details)
+                .HasForeignKey("PriceChangeRequestHeaderId")
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }

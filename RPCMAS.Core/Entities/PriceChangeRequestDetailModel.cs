@@ -16,18 +16,12 @@ namespace RPCMAS.Core.Entities
         public decimal CurrentPrice { get; set; }
         public decimal ProposedNewPrice { get; set; }
 
-        // Computed field (not stored in DB if you prefer)
-        public decimal MarkdownPercentage
-        {
-            get
-            {
-                if (CurrentPrice == 0) return 0;
-                return ((CurrentPrice - ProposedNewPrice) / CurrentPrice) * 100;
-            }
-        }
+        public decimal MarkdownPercentage { get; set; }
 
         public DateTime EffectiveDate { get; set; }
 
         public string Remarks { get; set; }
+
+        public PriceChangeRequestHeaderModel PriceChangeRequestHeader { get; set; }
     }
 }
