@@ -7,14 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RPCMAS.Core\RPCMAS.Core.csproj" />
+    <ProjectReference Include="..\RPCMAS.Infrastructure\RPCMAS.Infrastructure.csproj" />
     <ProjectReference Include="..\RPCMAS.ServiceDefaults\RPCMAS.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controller\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.26" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.7" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
   </ItemGroup>
