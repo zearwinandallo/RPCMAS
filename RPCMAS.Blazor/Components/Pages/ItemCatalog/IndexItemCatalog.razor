@@ -1,7 +1,277 @@
-﻿@page "/itemcatalog"
+@page "/itemcatalog"
+@rendermode InteractiveServer
 
-<h3>IndexItemCatalog</h3>
+<PageTitle>Item Catalog</PageTitle>
 
-@code {
+<div class="catalog-page">
+    <div class="catalog-header">
+        <div>
+            <h1>Item Catalog</h1>
+        </div>
 
-}
+        <div class="catalog-count">
+            <span>Total Items</span>
+            <strong>@itemCatalogModels.Count</strong>
+        </div>
+    </div>
+
+    <div class="catalog-toolbar">
+        <input class="catalog-search"
+               type="text"
+               value="@searchText"
+               @oninput="HandleSearchInput"
+               placeholder="Search by SKU or item name" />
+    </div>
+
+    <div class="catalog-layout">
+        <div class="catalog-list-panel">
+            <div class="panel-title">Item List</div>
+
+            @if (isLoading)
+            {
+                <div class="empty-state">Loading items...</div>
+            }
+            else if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <div class="empty-state">@errorMessage</div>
+            }
+            else if (itemCatalogModels.Any())
+            {
+                <div class="catalog-list">
+                    @foreach (var item in itemCatalogModels)
+                    {
+                        <button type="button" class="catalog-item @(selectedItemCatalog?.Id == item.Id ? "selected" : string.Empty)" @onclick="() => ViewItemDetailsAsync(item.Id)">
+                            <div>
+                                <strong>@item.ItemName</strong>
+                                <div class="item-subtitle">@item.SKU</div>
+                            </div>
+
+                            <div class="item-meta">
+                                <span>@item.Department</span>
+                                <strong>@item.CurrentPrice.ToString("C")</strong>
+                            </div>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">No items available.</div>
+            }
+        </div>
+
+        <div class="catalog-details-panel">
+            <div class="panel-title">Item Details</div>
+
+            <div class="details-card">
+                <div class="detail-row">
+                    <span>Item Name</span>
+                    <strong>@(selectedItemCatalog?.ItemName ?? "Select an item from the list")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>SKU</span>
+                    <strong>@(selectedItemCatalog?.SKU ?? "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Department</span>
+                    <strong>@(selectedItemCatalog?.Department ?? "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Category</span>
+                    <strong>@(selectedItemCatalog?.Category ?? "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Brand</span>
+                    <strong>@(selectedItemCatalog?.Brand ?? "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Current Price</span>
+                    <strong>@(selectedItemCatalog != null ? selectedItemCatalog.CurrentPrice.ToString("C") : "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Cost</span>
+                    <strong>@(selectedItemCatalog != null ? selectedItemCatalog.Cost.ToString("C") : "-")</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Status</span>
+                    <strong>@(selectedItemCatalog?.Status.ToString() ?? "-")</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .catalog-page {
+        padding: 1.5rem;
+    }
+
+    .catalog-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .catalog-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .catalog-header p {
+        margin: 0.35rem 0 0;
+        color: #5f6b7a;
+    }
+
+    .catalog-count {
+        min-width: 140px;
+        padding: 1rem;
+        border-radius: 12px;
+        background: #f3f6f9;
+        text-align: center;
+    }
+
+    .catalog-count span {
+        display: block;
+        font-size: 0.85rem;
+        color: #5f6b7a;
+    }
+
+    .catalog-count strong {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 1.5rem;
+    }
+
+    .catalog-toolbar {
+        margin-bottom: 1rem;
+    }
+
+    .catalog-search {
+        flex: 1;
+        padding: 0.85rem 1rem;
+        border: 1px solid #d2d8df;
+        border-radius: 10px;
+        font-size: 1rem;
+    }
+
+    .catalog-toolbar {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .catalog-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 1rem;
+    }
+
+    .catalog-list-panel,
+    .catalog-details-panel {
+        padding: 1rem;
+        border: 1px solid #e2e7ec;
+        border-radius: 14px;
+        background: #ffffff;
+    }
+
+    .panel-title {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .catalog-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 70vh;
+        overflow: auto;
+    }
+
+    .catalog-item {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid #e7ebf0;
+        border-radius: 12px;
+        background: #fafbfd;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .catalog-item.selected {
+        border-color: #2f6fed;
+        background: #eef4ff;
+    }
+
+    .item-subtitle {
+        margin-top: 0.25rem;
+        color: #5f6b7a;
+        font-size: 0.9rem;
+    }
+
+    .item-meta {
+        text-align: right;
+    }
+
+    .item-meta span {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #5f6b7a;
+        font-size: 0.9rem;
+    }
+
+    .details-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 0.9rem;
+        border-radius: 10px;
+        background: #f7f9fb;
+    }
+
+    .detail-row span {
+        color: #5f6b7a;
+    }
+
+    .empty-state {
+        padding: 1rem;
+        border-radius: 10px;
+        background: #f7f9fb;
+        color: #5f6b7a;
+    }
+
+    @@media (max-width: 900px) {
+        .catalog-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .catalog-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .catalog-toolbar {
+            flex-direction: column;
+        }
+
+        .catalog-item,
+        .detail-row {
+            flex-direction: column;
+        }
+
+        .item-meta {
+            text-align: left;
+        }
+    }
+</style>

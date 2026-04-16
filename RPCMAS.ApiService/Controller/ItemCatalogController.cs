@@ -17,7 +17,7 @@ namespace RPCMAS.API.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<BaseResponseModel>> GetItemCatalogs([FromQuery] ItemCatalogFilter? filter)
+        public async Task<ActionResult<BaseResponseModel>> GetItemCatalogs([FromQuery] string? filter = null)
         {
             var itemCatalogs = new List<ItemCatalogModel>();
             var errorMessage = string.Empty;

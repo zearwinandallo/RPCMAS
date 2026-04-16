@@ -12,8 +12,7 @@ namespace RPCMAS.Core.Interfaces
 {
     public interface IItemCatalogService
     {
-        Task<List<ItemCatalogModel>> GetItemCatalogs(ItemCatalogFilter? filter = null);
-
+        Task<List<ItemCatalogModel>> GetItemCatalogs(string? filter);
         Task<ItemCatalogModel?> GetItemCatalogById(Guid id);
         Task<ItemCatalogModel> CreateItemCatalog(ItemCatalogModel itemCatalog);
         Task<ItemCatalogModel?> UpdateItemCatalog(ItemCatalogModel itemCatalog);

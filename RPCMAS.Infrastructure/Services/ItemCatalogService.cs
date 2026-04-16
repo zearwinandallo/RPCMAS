@@ -18,7 +18,7 @@ namespace RPCMAS.Infrastructure.Services
             _itemCatalogRepository = itemCatalogRepository;
         }
 
-        public Task<List<ItemCatalogModel>> GetItemCatalogs(ItemCatalogFilter? filter = null)
+        public Task<List<ItemCatalogModel>> GetItemCatalogs(string? filter)
         {
             return _itemCatalogRepository.GetItemCatalogs(filter);
         }

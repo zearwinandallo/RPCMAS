@@ -20,47 +20,19 @@ namespace RPCMAS.Infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<List<ItemCatalogModel>> GetItemCatalogs(ItemCatalogFilter? filter = null)
+        public async Task<List<ItemCatalogModel>> GetItemCatalogs(string? filter)
         {
-            filter ??= new ItemCatalogFilter();
 
             var query = _appDbContext.ItemCatalogs.AsNoTracking().AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(filter.Search))
+            if (!string.IsNullOrWhiteSpace(filter))
             {
-                var keyword = filter.Search.Trim();
+                var keyword = filter.Trim();
 
                 query = query.Where(item =>
                     item.SKU.Contains(keyword) ||
-                    item.ItemName.Contains(keyword) ||
-                    item.Department.Contains(keyword) ||
-                    item.Category.Contains(keyword) ||
-                    item.Brand.Contains(keyword));
+                    item.ItemName.Contains(keyword));
             }
-
-            if (!string.IsNullOrWhiteSpace(filter.SKU))
-                query = query.Where(item => item.SKU.Contains(filter.SKU.Trim()));
-
-            if (!string.IsNullOrWhiteSpace(filter.ItemName))
-                query = query.Where(item => item.ItemName.Contains(filter.ItemName.Trim()));
-
-            if (!string.IsNullOrWhiteSpace(filter.Department))
-                query = query.Where(item => item.Department.Contains(filter.Department.Trim()));
-
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-                query = query.Where(item => item.Category.Contains(filter.Category.Trim()));
-
-            if (!string.IsNullOrWhiteSpace(filter.Brand))
-                query = query.Where(item => item.Brand.Contains(filter.Brand.Trim()));
-
-            if (filter.CurrentPrice.HasValue)
-                query = query.Where(item => item.CurrentPrice == filter.CurrentPrice.Value);
-
-            if (filter.Cost.HasValue)
-                query = query.Where(item => item.Cost == filter.Cost.Value);
-
-            if (filter.Status.HasValue)
-                query = query.Where(item => item.Status == filter.Status.Value);
 
             return await query.ToListAsync();
         }
