@@ -14,9 +14,6 @@ namespace RPCMAS.Core.Interfaces
     {
         Task<List<ItemCatalogModel>> GetItemCatalogs(string? filter);
         Task<ItemCatalogModel?> GetItemCatalogById(Guid id);
-        Task<ItemCatalogModel> CreateItemCatalog(ItemCatalogModel itemCatalog);
-        Task<ItemCatalogModel?> UpdateItemCatalog(ItemCatalogModel itemCatalog);
-        Task<bool> DeleteItemCatalog(Guid id);
     }
 }
 

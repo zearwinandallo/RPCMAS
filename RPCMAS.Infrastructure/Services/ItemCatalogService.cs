@@ -27,20 +27,5 @@ namespace RPCMAS.Infrastructure.Services
         {
             return _itemCatalogRepository.GetItemCatalogById(id);
         }
-
-        public Task<ItemCatalogModel> CreateItemCatalog(ItemCatalogModel itemCatalog)
-        {
-            return _itemCatalogRepository.CreateItemCatalog(itemCatalog);
-        }
-
-        public Task<ItemCatalogModel?> UpdateItemCatalog(ItemCatalogModel itemCatalog)
-        {
-            return _itemCatalogRepository.UpdateItemCatalog(itemCatalog);
-        }
-
-        public Task<bool> DeleteItemCatalog(Guid id)
-        {
-            return _itemCatalogRepository.DeleteItemCatalog(id);
-        }
     }
 }
