@@ -16,5 +16,7 @@ namespace RPCMAS.Core.Data
         }
 
         public DbSet<ItemCatalogModel> ItemCatalogs { get; set; }
+        public DbSet<PriceChangeRequestDetailModel> PriceChangeRequestDetails { get; set; }
+        public DbSet<PriceChangeRequestHeaderModel> PriceChangeRequestHeaders { get; set; }
     }
 }
