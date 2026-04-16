@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RPCMAS.ApiService\RPCMAS.ApiService.csproj" />
-    <ProjectReference Include="..\RPCMAS.Web\RPCMAS.Web.csproj" />
+    <ProjectReference Include="..\RPCMAS.ApiService\RPCMAS.API.csproj" />
+    <ProjectReference Include="..\RPCMAS.Blazor\RPCMAS.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

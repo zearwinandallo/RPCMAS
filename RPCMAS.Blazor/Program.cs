@@ -1,5 +1,5 @@
-using RPCMAS.Web;
-using RPCMAS.Web.Components;
+using RPCMAS.Blazor;
+using RPCMAS.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,4 +1,4 @@
-namespace RPCMAS.Web;
+namespace RPCMAS.Blazor;
 
 public class WeatherApiClient(HttpClient httpClient)
 {
