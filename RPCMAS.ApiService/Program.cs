@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RPCMAS.Core.Data;
 using RPCMAS.Core.Interfaces;
 using RPCMAS.Infrastructure.Repositories;
+using RPCMAS.Infrastructure.Seeder;
 using RPCMAS.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IItemCatalogRepository, ItemCatalogRepository>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+await ItemCatalogSeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();

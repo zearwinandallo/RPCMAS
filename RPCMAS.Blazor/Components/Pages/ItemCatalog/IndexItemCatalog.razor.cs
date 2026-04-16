@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using RPCMAS.Core.Entities;
+using RPCMAS.Core.Models;
 
 namespace RPCMAS.Blazor.Components.Pages.ItemCatalog
 {
