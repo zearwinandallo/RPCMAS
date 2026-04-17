@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using RPCMAS.Core.Entities;
 using RPCMAS.Core.Models;
@@ -15,6 +16,9 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
 
         [Inject]
         public NavigationManager NavigationManager { get; set; } = default!;
+
+        [Inject]
+        public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
         [SupplyParameterFromQuery(Name = "mode")]
         public string? Mode { get; set; }
@@ -44,6 +48,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         public string modalErrorMessage { get; set; } = string.Empty;
         public List<string> modalValidationMessages { get; set; } = new();
         public PriceChangeRequestHeaderModel? modalRequestModel { get; set; }
+        public string currentUserName { get; set; } = string.Empty;
 
         private string? lastHandledMode;
         private Guid? lastHandledRequestId;
@@ -54,6 +59,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
 
         protected override async Task OnInitializedAsync()
         {
+            await LoadCurrentUserAsync();
             await LoadItemCatalogsAsync();
             await LoadRequestsAsync();
             await base.OnInitializedAsync();
@@ -178,6 +184,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             modalErrorMessage = string.Empty;
             modalValidationMessages.Clear();
             modalRequestModel = CreateEmptyRequest();
+            ApplyCurrentUserToModalRequest();
             AddDetailRow();
             return Task.CompletedTask;
         }
@@ -199,6 +206,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             if (response != null && response.IsSuccess && response.Data != null)
             {
                 modalRequestModel = DeserializeResponse<PriceChangeRequestHeaderModel>(response.Data);
+                ApplyCurrentUserToModalRequest();
                 canEditModal = modalRequestModel?.Status == RequestStatusEnum.Draft;
             }
             else
@@ -207,6 +215,16 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             }
 
             isModalLoading = false;
+        }
+
+        private void ApplyCurrentUserToModalRequest()
+        {
+            if (modalRequestModel == null || string.IsNullOrWhiteSpace(currentUserName))
+            {
+                return;
+            }
+
+            modalRequestModel.RequestedBy = currentUserName;
         }
 
         public void CloseModal()
@@ -333,6 +351,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             }
 
             isModalSaving = true;
+            ApplyCurrentUserToModalRequest();
             PrepareDetailsForSave();
 
             BaseResponseModel? response;
@@ -556,6 +575,12 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
                 ChangeType = ChangeTypeEnum.RegularPriceUpdate,
                 Status = RequestStatusEnum.Draft
             };
+        }
+
+        private async Task LoadCurrentUserAsync()
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            currentUserName = authState.User.Identity?.Name ?? string.Empty;
         }
 
         private static string GetDepartmentLabel(DepartmentEnum department)
