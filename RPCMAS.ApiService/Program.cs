@@ -1,9 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RPCMAS.Core.Data;
 using RPCMAS.Core.Interfaces;
 using RPCMAS.Infrastructure.Repositories;
 using RPCMAS.Infrastructure.Seeder;
 using RPCMAS.Infrastructure.Services;
+using Microsoft.OpenApi;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +19,21 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "bearer",
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("bearer", document)] = []
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -33,12 +52,30 @@ builder.Services.AddScoped<IPriceChangeRequestRepository, PriceChangeRequestRepo
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
+var secret = builder.Configuration.GetValue<string>("Jwt:Secret");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "zearwin",
+        ValidAudience = "zearwin",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+    };
+});
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 await ItemCatalogSeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
