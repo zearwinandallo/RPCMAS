@@ -73,6 +73,7 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 await ItemCatalogSeeder.SeedAsync(app.Services);
+await UserAccessSeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
