@@ -37,23 +37,6 @@ public class ApiClient(HttpClient httpClient)
         return await httpClient.DeleteFromJsonAsync<T>(path);
     }
 
-    public Task<BaseResponseModel?> GetItemCatalogsAsync(string? filter = null)
-    {
-        var path = "/api/ItemCatalog";
-
-        if (!string.IsNullOrWhiteSpace(filter))
-        {
-            path += $"?filter={Uri.EscapeDataString(filter)}";
-        }
-
-        return GetFromJsonAsync<BaseResponseModel>(path);
-    }
-
-    public Task<BaseResponseModel?> GetItemCatalogByIdAsync(Guid id)
-    {
-        return GetFromJsonAsync<BaseResponseModel>($"/api/ItemCatalog/{id}");
-    }
-
 }
 
 #nullable restore

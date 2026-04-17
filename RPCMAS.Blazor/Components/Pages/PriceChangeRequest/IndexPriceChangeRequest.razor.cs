@@ -389,7 +389,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
 
         private async Task LoadItemCatalogsAsync()
         {
-            var response = await ApiClient.GetItemCatalogsAsync();
+            var response = await ApiClient.GetFromJsonAsync<BaseResponseModel>("/api/ItemCatalog");
 
             if (response != null && response.IsSuccess && response.Data != null)
             {

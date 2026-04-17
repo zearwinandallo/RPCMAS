@@ -38,7 +38,7 @@ namespace RPCMAS.Blazor.Components.Pages.ItemCatalog
 
         public async Task ViewItemDetailsAsync(Guid id)
         {
-            var res = await ApiClient.GetItemCatalogByIdAsync(id);
+            var res = await ApiClient.GetFromJsonAsync<BaseResponseModel>($"/api/ItemCatalog/{id}");
 
             if (res != null && res.IsSuccess && res.Data != null)
             {
@@ -51,7 +51,14 @@ namespace RPCMAS.Blazor.Components.Pages.ItemCatalog
             isLoading = true;
             errorMessage = string.Empty;
 
-            var res = await ApiClient.GetItemCatalogsAsync(filter);
+            var path = "/api/ItemCatalog";
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                path += $"?filter={Uri.EscapeDataString(filter)}";
+            }
+
+            var res = await ApiClient.GetFromJsonAsync<BaseResponseModel>(path);
 
             if (res != null && res.IsSuccess && res.Data != null)
             {
