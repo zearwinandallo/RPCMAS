@@ -1,11 +1,18 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using RPCMAS.Blazor;
+using RPCMAS.Blazor.Authentication;
 using RPCMAS.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthenticationCore();
+builder.Services.AddCascadingAuthenticationState();
+
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
+
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -31,6 +38,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseOutputCache();
 
