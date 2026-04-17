@@ -18,6 +18,10 @@ namespace RPCMAS.Core.Data
         public DbSet<ItemCatalogModel> ItemCatalogs { get; set; }
         public DbSet<PriceChangeRequestDetailModel> PriceChangeRequestDetails { get; set; }
         public DbSet<PriceChangeRequestHeaderModel> PriceChangeRequestHeaders { get; set; }
+        public DbSet<UserModel> Users { get; set; }
+        public DbSet<UserRoleModel> UserRoles { get; set; }
+        public DbSet<RoleModel> Roles { get; set; }
+        public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +32,18 @@ namespace RPCMAS.Core.Data
             .WithMany(header => header.Details)
             .HasForeignKey(d => d.PriceChangeRequestHeaderId)
             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRoleModel>()
+            .HasOne(userRole => userRole.User)
+            .WithMany(user => user.UserRoles)
+            .HasForeignKey(userRole => userRole.UserID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRoleModel>()
+            .HasOne(userRole => userRole.Role)
+            .WithMany()
+            .HasForeignKey(userRole => userRole.RoleID)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

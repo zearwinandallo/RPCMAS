@@ -48,6 +48,8 @@ builder.Services.AddScoped<IPriceChangeRequestService, PriceChangeRequestService
 builder.Services.AddScoped<IItemCatalogRepository, ItemCatalogRepository>();
 builder.Services.AddScoped<IPriceChangeRequestRepository, PriceChangeRequestRepository>();
 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
