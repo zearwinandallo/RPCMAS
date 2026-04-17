@@ -36,6 +36,19 @@
                     <input class="form-control" @bind="filter.RequestNumber" />
                 </div>
                 <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" @bind="selectedStatus">
+                        <option value="">All</option>
+                        @foreach (var status in requestStatuses)
+                        {
+                            if (status != RequestStatusEnum.Draft)
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label class="form-label">Department</label>
                     <select class="form-select" value="@filter.Department" @onchange="HandleDepartmentChanged">
                         <option value="">All</option>

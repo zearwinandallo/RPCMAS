@@ -148,6 +148,27 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             isActionRunning = false;
         }
 
+        public async Task CancelRequestAsync(Guid id)
+        {
+            isActionRunning = true;
+            errorMessage = string.Empty;
+            statusMessage = string.Empty;
+
+            var response = await ApiClient.PostAsync<BaseResponseModel, object>($"/api/PriceChangeRequest/{id}/cancel", new { });
+
+            if (response != null && response.IsSuccess)
+            {
+                statusMessage = "Request cancelled successfully.";
+                await LoadRequestsAsync();
+            }
+            else
+            {
+                errorMessage = response?.ErrorMessage ?? "Unable to cancel the request.";
+            }
+
+            isActionRunning = false;
+        }
+
         public Task OpenCreateModalAsync()
         {
             showModal = true;

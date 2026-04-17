@@ -1,4 +1,5 @@
 @page "/pricechangerequest"
+@using RPCMAS.Core.Models
 @rendermode InteractiveServer
 
 <PageTitle>Price Change Requests</PageTitle>
@@ -125,6 +126,9 @@
                                         {
                                             <button class="btn btn-sm btn-outline-primary me-1 mb-1" @onclick="() => OpenEditModalAsync(request.Id)">Edit</button>
                                             <button class="btn btn-sm btn-success mb-1" disabled="@isActionRunning" @onclick="() => SubmitRequestAsync(request.Id)">Submit</button>
+                                            <button class="btn btn-sm btn-outline-danger ms-1 mb-1" title="Cancel Request" disabled="@isActionRunning" @onclick="() => CancelRequestAsync(request.Id)">
+                                                Cancel
+                                            </button>
                                         }
                                     </td>
                                 </tr>
