@@ -71,6 +71,12 @@ namespace RPCMAS.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public Task<PriceChangeRequestHeaderModel?> GetPriceChangeRequestHeaderByIdForUpdate(Guid id)
+        {
+            return _appDbContext.PriceChangeRequestHeaders
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
         public Task<List<PriceChangeRequestDetailModel>> GetDetailsByHeaderId(Guid priceChangeRequestHeaderId)
         {
             return _appDbContext.PriceChangeRequestDetails
@@ -87,6 +93,23 @@ namespace RPCMAS.Infrastructure.Repositories
         public async Task AddPriceChangeRequest(PriceChangeRequestHeaderModel request)
         {
             await _appDbContext.PriceChangeRequestHeaders.AddAsync(request);
+        }
+
+        public async Task DeletePriceChangeRequestDetailsByHeaderId(Guid headerId)
+        {
+            var details = await _appDbContext.PriceChangeRequestDetails
+                .Where(x => x.PriceChangeRequestHeaderId == headerId)
+                .ToListAsync();
+
+            if (details.Count != 0)
+            {
+                _appDbContext.PriceChangeRequestDetails.RemoveRange(details);
+            }
+        }
+
+        public async Task AddPriceChangeRequestDetails(IEnumerable<PriceChangeRequestDetailModel> details)
+        {
+            await _appDbContext.PriceChangeRequestDetails.AddRangeAsync(details);
         }
 
         public Task SaveChanges()

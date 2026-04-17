@@ -1,0 +1,312 @@
+@page "/pricechangerequest"
+@rendermode InteractiveServer
+
+<PageTitle>Price Change Requests</PageTitle>
+
+<div class="container-fluid py-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Price Change Requests</h1>
+            <div class="text-muted">All requests sorted by newest request date first.</div>
+        </div>
+        <div>
+            <button class="btn btn-primary" @onclick="OpenCreateModalAsync">
+                <span class="bi bi-plus-circle me-1"></span>Create Request
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert alert-success">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">Filters</div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label">Request Number</label>
+                    <input class="form-control" @bind="filter.RequestNumber" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" @bind="selectedStatus">
+                        <option value="">All</option>
+                        @foreach (var status in requestStatuses)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Department</label>
+                    <select class="form-select" value="@filter.Department" @onchange="HandleFilterDepartmentChanged">
+                        <option value="">All</option>
+                        @foreach (var department in departments)
+                        {
+                            <option value="@GetDepartmentLabel(department)">@GetDepartmentLabel(department)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Change Type</label>
+                    <select class="form-select" @bind="selectedChangeType">
+                        <option value="">All</option>
+                        @foreach (var changeType in changeTypes)
+                        {
+                            <option value="@changeType">@GetChangeTypeLabel(changeType)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Request Date</label>
+                    <input class="form-control" type="date" value="@requestDateText" @onchange="HandleRequestDateChanged" />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button class="btn btn-secondary w-100" @onclick="LoadRequestsAsync">Search</button>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-link px-0" @onclick="ClearFiltersAsync">Clear Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Requests List</span>
+            <span class="text-muted small">@requestHeaders.Count request(s)</span>
+        </div>
+        <div class="card-body p-0">
+            @if (isLoading)
+            {
+                <div class="p-3">Loading requests...</div>
+            }
+            else if (!requestHeaders.Any())
+            {
+                <div class="p-3">No requests found.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request Number</th>
+                                <th>Request Date</th>
+                                <th>Department</th>
+                                <th>Requested By</th>
+                                <th>Change Type</th>
+                                <th>Status</th>
+                                <th>Items</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var request in requestHeaders)
+                            {
+                                <tr>
+                                    <td>@request.RequestNumber</td>
+                                    <td>@request.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@request.Department</td>
+                                    <td>@request.RequestedBy</td>
+                                    <td>@GetChangeTypeLabel(request.ChangeType)</td>
+                                    <td>@request.Status</td>
+                                    <td>@request.Details.Count</td>
+                                    <td class="text-nowrap">
+                                        <a class="btn btn-sm btn-outline-secondary me-1 mb-1" href="@($"/pricechangerequest/view/{request.Id}")">View</a>
+                                        @if (request.Status == RequestStatusEnum.Draft)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary me-1 mb-1" @onclick="() => OpenEditModalAsync(request.Id)">Edit</button>
+                                            <button class="btn btn-sm btn-success mb-1" disabled="@isActionRunning" @onclick="() => SubmitRequestAsync(request.Id)">Submit</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.35);">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@modalTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    @if (modalValidationMessages.Any())
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var message in modalValidationMessages)
+                            {
+                                <div>@message</div>
+                            }
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(modalErrorMessage))
+                    {
+                        <div class="alert alert-danger">@modalErrorMessage</div>
+                    }
+
+                    @if (isModalLoading)
+                    {
+                        <div>Loading request...</div>
+                    }
+                    else if (modalRequestModel == null)
+                    {
+                        <div class="alert alert-warning">Request could not be loaded.</div>
+                    }
+                    else if (!canEditModal)
+                    {
+                        <div class="alert alert-warning">
+                            Only Draft requests can be edited. This request is currently <strong>@modalRequestModel.Status</strong>.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">Request Information</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    @if (isEditingModal)
+                                    {
+                                        <div class="col-md-3">
+                                            <label class="form-label">Request Number</label>
+                                            <input class="form-control" value="@modalRequestModel.RequestNumber" readonly />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Request Date</label>
+                                            <input class="form-control" value="@modalRequestModel.RequestDate.ToString("yyyy-MM-dd HH:mm")" readonly />
+                                        </div>
+                                    }
+                                    <div class="col-md-3">
+                                        <label class="form-label">Department</label>
+                                        <select class="form-select" value="@modalRequestModel.Department" @onchange="HandleModalDepartmentChanged">
+                                            <option value="">Select department</option>
+                                            @foreach (var department in departments)
+                                            {
+                                                <option value="@GetDepartmentLabel(department)">@GetDepartmentLabel(department)</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Requested By</label>
+                                        <input class="form-control" @bind="modalRequestModel.RequestedBy" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Change Type</label>
+                                        <select class="form-select" @bind="modalRequestModel.ChangeType">
+                                            @foreach (var changeType in changeTypes)
+                                            {
+                                                <option value="@changeType">@GetChangeTypeLabel(changeType)</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Reason / Justification</label>
+                                        <textarea class="form-control" rows="3" @bind="modalRequestModel.ReasonOrJustification"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Request Items</span>
+                                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="AddDetailRow">Add Item</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0 align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="min-width:240px;">Item</th>
+                                                <th>Current Price</th>
+                                                <th>Proposed New Price</th>
+                                                <th>Markdown %</th>
+                                                <th>Effective Date</th>
+                                                <th>Remarks</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (!modalRequestModel.Details.Any())
+                                            {
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No items added.</td>
+                                                </tr>
+                                            }
+                                            @for (var index = 0; index < modalRequestModel.Details.Count; index++)
+                                            {
+                                                var detail = modalRequestModel.Details[index];
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select form-select-sm" @bind="detail.SKU" @bind:after="() => HandleItemSelected(detail)">
+                                                            <option value="">Select item</option>
+                                                            @foreach (var item in itemCatalogs)
+                                                            {
+                                                                <option value="@item.SKU">@item.SKU - @item.ItemName</option>
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" value="@detail.CurrentPrice.ToString("0.00")" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm"
+                                                               type="number"
+                                                               step="0.01"
+                                                               value="@detail.ProposedNewPrice"
+                                                               @oninput="args => HandleProposedPriceChanged(detail, args.Value?.ToString())" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" value="@detail.MarkdownPercentage.ToString("0.00")" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" type="date" @bind="detail.EffectiveDate" @bind:format="yyyy-MM-dd" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" @bind="detail.Remarks" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveDetailRow(detail)">Remove</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" @onclick="CloseModal">Close</button>
+                    @if (canEditModal && modalRequestModel != null)
+                    {
+                        <button class="btn btn-primary" disabled="@isModalSaving" @onclick="SaveDraftFromModalAsync">
+                            @(isEditingModal ? "Save Draft" : "Create Draft")
+                        </button>
+                        <button class="btn btn-success" disabled="@isModalSaving" @onclick="SaveAndSubmitFromModalAsync">
+                            @(isEditingModal ? "Save and Submit" : "Create and Submit")
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

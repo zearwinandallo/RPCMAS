@@ -56,7 +56,7 @@ namespace RPCMAS.Infrastructure.Services
 
         public async Task<PriceChangeRequestHeaderModel?> EditDraftRequest(Guid id, PriceChangeRequestHeaderModel request)
         {
-            var existingRequest = await _priceChangeRequestRepository.GetPriceChangeRequestByIdForUpdate(id);
+            var existingRequest = await _priceChangeRequestRepository.GetPriceChangeRequestHeaderByIdForUpdate(id);
 
             if (existingRequest == null)
             {
@@ -65,21 +65,19 @@ namespace RPCMAS.Infrastructure.Services
 
             EnsureDraftOnly(existingRequest, "edited");
 
+            var rebuiltDetails = await BuildDetails(request.Details, existingRequest.Id);
+
             existingRequest.Department = request.Department;
             existingRequest.RequestedBy = request.RequestedBy;
             existingRequest.ChangeType = request.ChangeType;
             existingRequest.ReasonOrJustification = request.ReasonOrJustification;
-            existingRequest.Details.Clear();
-
-            var details = await BuildDetails(request.Details, existingRequest.Id);
-            foreach (var detail in details)
-            {
-                existingRequest.Details.Add(detail);
-            }
+            await _priceChangeRequestRepository.SaveChanges();
+            await _priceChangeRequestRepository.DeletePriceChangeRequestDetailsByHeaderId(existingRequest.Id);
+            await _priceChangeRequestRepository.AddPriceChangeRequestDetails(rebuiltDetails);
 
             await _priceChangeRequestRepository.SaveChanges();
 
-            return existingRequest;
+            return await _priceChangeRequestRepository.GetPriceChangeRequestById(existingRequest.Id);
         }
 
         public async Task<PriceChangeRequestHeaderModel?> SubmitRequest(Guid id)
@@ -208,7 +206,7 @@ namespace RPCMAS.Infrastructure.Services
                     ItemName = item.ItemName,
                     CurrentPrice = item.CurrentPrice,
                     ProposedNewPrice = detail.ProposedNewPrice,
-                    MarkdownPercentage = GetMarkdownPercentage(item.CurrentPrice, detail.ProposedNewPrice),
+                    MarkdownPercentage = detail.MarkdownPercentage,
                     EffectiveDate = detail.EffectiveDate,
                     Remarks = detail.Remarks,
                     PriceChangeRequestHeaderId = headerId
@@ -252,14 +250,6 @@ namespace RPCMAS.Infrastructure.Services
             return $"PCR-{DateTime.Now:yyyyMMddHHmmssfff}";
         }
 
-        private static decimal GetMarkdownPercentage(decimal currentPrice, decimal proposedNewPrice)
-        {
-            if (currentPrice <= 0)
-            {
-                return 0;
-            }
-
-            return Math.Round(((currentPrice - proposedNewPrice) / currentPrice) * 100, 2);
-        }
+       
     }
 }

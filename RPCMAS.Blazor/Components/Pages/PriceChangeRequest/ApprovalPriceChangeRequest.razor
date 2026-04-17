@@ -1,0 +1,133 @@
+@page "/pricechangerequest/approval"
+@page "/pricechangerequest/approval/{ViewMode}"
+@using RPCMAS.Core.Models
+@rendermode InteractiveServer
+
+<PageTitle>Price Change Request Approval</PageTitle>
+
+<div class="container-fluid py-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">@pageTitle</h1>
+            <div class="text-muted">@pageSubtitle</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="/pricechangerequest/approval">Approval Queue</a>
+            <a class="btn btn-outline-secondary" href="/pricechangerequest/approval/history">Approved / History List</a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert alert-success">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">Filters</div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label">Request Number</label>
+                    <input class="form-control" @bind="filter.RequestNumber" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Department</label>
+                    <select class="form-select" value="@filter.Department" @onchange="HandleDepartmentChanged">
+                        <option value="">All</option>
+                        @foreach (var department in departments)
+                        {
+                            <option value="@GetDepartmentLabel(department)">@GetDepartmentLabel(department)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Change Type</label>
+                    <select class="form-select" @bind="selectedChangeType">
+                        <option value="">All</option>
+                        @foreach (var changeType in changeTypes)
+                        {
+                            <option value="@changeType">@GetChangeTypeLabel(changeType)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Request Date</label>
+                    <input class="form-control" type="date" value="@requestDateText" @onchange="HandleRequestDateChanged" />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button class="btn btn-secondary w-100" @onclick="LoadRequestsAsync">Search</button>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-link px-0" @onclick="ClearFiltersAsync">Clear Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>@tableTitle</span>
+            <span class="text-muted small">@requestHeaders.Count request(s)</span>
+        </div>
+        <div class="card-body p-0">
+            @if (isLoading)
+            {
+                <div class="p-3">Loading requests...</div>
+            }
+            else if (!requestHeaders.Any())
+            {
+                <div class="p-3">No requests found.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request Number</th>
+                                <th>Request Date</th>
+                                <th>Department</th>
+                                <th>Requested By</th>
+                                <th>Change Type</th>
+                                <th>Status</th>
+                                <th>Items</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var request in requestHeaders)
+                            {
+                                <tr>
+                                    <td>@request.RequestNumber</td>
+                                    <td>@request.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@request.Department</td>
+                                    <td>@request.RequestedBy</td>
+                                    <td>@GetChangeTypeLabel(request.ChangeType)</td>
+                                    <td>@request.Status</td>
+                                    <td>@request.Details.Count</td>
+                                    <td class="text-nowrap">
+                                        <a class="btn btn-sm btn-outline-secondary me-1 mb-1" href="@($"/pricechangerequest/view/{request.Id}")">View</a>
+                                        @if (request.Status == RequestStatusEnum.Submitted)
+                                        {
+                                            <button class="btn btn-sm btn-success me-1 mb-1" disabled="@isActionRunning" @onclick="() => ApproveRequestAsync(request.Id)">Approve</button>
+                                            <button class="btn btn-sm btn-danger mb-1" disabled="@isActionRunning" @onclick="() => RejectRequestAsync(request.Id)">Reject</button>
+                                        }
+                                        else if (request.Status == RequestStatusEnum.Approved)
+                                        {
+                                            <button class="btn btn-sm btn-primary mb-1" disabled="@isActionRunning" @onclick="() => ApplyRequestAsync(request.Id)">Apply</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
