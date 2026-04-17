@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+@using Microsoft.AspNetCore.Components.Authorization
+@using RPCMAS.Core.Models
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">RPCMAS</a>
     </div>
@@ -20,35 +23,47 @@
             </NavLink>
         </div> *@
 
-        <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
-            <span>Item Catalog</span>
-        </div>
+        <AuthorizeView Roles="@($"{nameof(UserRoleEnum.DepartmentSupervisor)},{nameof(UserRoleEnum.MerchandisingManager)},{nameof(UserRoleEnum.StoreManager)}")">
+            <Authorized>
+                <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
+                    <span>Item Catalog</span>
+                </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="itemcatalog">
-                <span class="bi bi-list-nested" aria-hidden="true"></span> Item List
-            </NavLink>
-        </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="itemcatalog">
+                        <span class="bi bi-list-nested" aria-hidden="true"></span> Item List
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
 
-        <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
-            <span>Requesting</span>
-        </div>
+        <AuthorizeView Roles="@($"{nameof(UserRoleEnum.DepartmentSupervisor)},{nameof(UserRoleEnum.MerchandisingManager)}")">
+            <Authorized>
+                <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
+                    <span>Requesting</span>
+                </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="pricechangerequest">
-                <span class="bi bi-list-nested" aria-hidden="true"></span> Requests List
-            </NavLink>
-        </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="pricechangerequest">
+                        <span class="bi bi-list-nested" aria-hidden="true"></span> Requests List
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
 
-        <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
-            <span>Approval</span>
-        </div>
+        <AuthorizeView Roles="@($"{nameof(UserRoleEnum.StoreManager)},{nameof(UserRoleEnum.MerchandisingManager)}")">
+            <Authorized>
+                <div class="nav-item px-3 mt-2 text-uppercase small text-muted">
+                    <span>Approval</span>
+                </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="pricechangerequest/approval">
-                <span class="bi bi-list-nested" aria-hidden="true"></span> Approval Queue
-            </NavLink>
-        </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="pricechangerequest/approval">
+                        <span class="bi bi-list-nested" aria-hidden="true"></span> Approval Queue
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
 
 @*         <div class="nav-item px-3">
             <NavLink class="nav-link" href="weather">
