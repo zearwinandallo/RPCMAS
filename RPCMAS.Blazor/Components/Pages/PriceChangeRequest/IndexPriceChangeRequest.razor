@@ -79,8 +79,8 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card shadow-sm border-0 modern-request-table-card">
+        <div class="card-header d-flex justify-content-between align-items-center modern-request-table-header">
             <span>Requests List</span>
             <span class="text-muted small">@requestHeaders.Count request(s)</span>
         </div>
@@ -95,9 +95,9 @@
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered table-striped mb-0 align-middle">
-                        <thead class="table-light">
+                <div class="table-responsive modern-request-table-wrap">
+                    <table class="table table-sm mb-0 align-middle modern-request-table">
+                        <thead>
                             <tr>
                                 <th>Request Number</th>
                                 <th>Request Date</th>
@@ -140,6 +140,56 @@
         </div>
     </div>
 </div>
+
+<style>
+    .modern-request-table-card {
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .modern-request-table-header {
+        padding: 0.95rem 1.25rem;
+        border-bottom: 1px solid #edf1f6;
+        background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+        color: #223042;
+        font-weight: 700;
+    }
+
+    .modern-request-table {
+        --bs-table-bg: transparent;
+    }
+
+    .modern-request-table thead th {
+        padding: 0.9rem 1rem;
+        border-color: #edf1f6;
+        background: #f8fafc;
+        color: #5b6777;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+
+    .modern-request-table tbody td {
+        padding: 0.95rem 1rem;
+        border-color: #edf1f6;
+        color: #1f2b3a;
+        font-weight: 500;
+    }
+
+    .modern-request-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .modern-request-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .modern-request-table tbody td.text-nowrap .btn {
+        box-shadow: none;
+    }
+</style>
 
 @if (showModal)
 {

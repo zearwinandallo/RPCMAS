@@ -31,10 +31,11 @@
     }
     else
     {
-        <div class="card mb-3">
-            <div class="card-header">Request Information</div>
+        <div class="card shadow-sm border-0 mb-3 modern-table-card">
+            <div class="card-header modern-table-header">Request Information</div>
             <div class="card-body p-0">
-                <table class="table table-sm table-bordered mb-0">
+                <div class="table-responsive modern-table-wrap">
+                    <table class="table table-sm mb-0 modern-info-table">
                     <tbody>
                         <tr>
                             <th style="width:220px;">Request Number</th>
@@ -65,16 +66,17 @@
                             <td>@requestModel.ReasonOrJustification</td>
                         </tr>
                     </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class="card mb-3">
-            <div class="card-header">Items</div>
+        <div class="card shadow-sm border-0 mb-3 modern-table-card">
+            <div class="card-header modern-table-header">Items</div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered table-striped mb-0">
-                        <thead class="table-light">
+                <div class="table-responsive modern-table-wrap">
+                    <table class="table table-sm mb-0 modern-data-table">
+                        <thead>
                             <tr>
                                 <th>SKU</th>
                                 <th>Item Name</th>
@@ -121,3 +123,74 @@
         </div>
     }
 </div>
+
+<style>
+    .modern-table-card {
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .modern-table-header {
+        padding: 0.95rem 1.25rem;
+        border-bottom: 1px solid #edf1f6;
+        background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+        color: #223042;
+        font-weight: 700;
+    }
+
+    .modern-table-wrap {
+        border-top: 0;
+    }
+
+    .modern-info-table,
+    .modern-data-table {
+        --bs-table-bg: transparent;
+        margin: 0;
+    }
+
+    .modern-info-table th,
+    .modern-info-table td,
+    .modern-data-table th,
+    .modern-data-table td {
+        padding: 0.9rem 1rem;
+        border-color: #edf1f6;
+        vertical-align: middle;
+    }
+
+    .modern-info-table th {
+        width: 220px;
+        background: #f8fafc;
+        color: #5b6777;
+        font-weight: 600;
+    }
+
+    .modern-info-table td {
+        color: #1f2b3a;
+        font-weight: 500;
+        background: #fff;
+    }
+
+    .modern-data-table thead th {
+        background: #f8fafc;
+        color: #5b6777;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        border-bottom-width: 1px;
+    }
+
+    .modern-data-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .modern-data-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .modern-data-table tbody td {
+        color: #1f2b3a;
+        font-weight: 500;
+    }
+</style>
