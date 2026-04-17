@@ -26,6 +26,7 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         public bool isLoading { get; set; } = true;
         public bool isActionRunning { get; set; }
         private int successNotificationVersion { get; set; }
+        private string? lastHandledViewMode;
 
         protected IReadOnlyList<RequestStatusEnum> requestStatuses { get; } = Enum.GetValues<RequestStatusEnum>();
         protected IReadOnlyList<ChangeTypeEnum> changeTypes { get; } = Enum.GetValues<ChangeTypeEnum>();
@@ -41,6 +42,17 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             await LoadRequestsAsync();
             await base.OnInitializedAsync();
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (string.Equals(ViewMode, lastHandledViewMode, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            lastHandledViewMode = ViewMode;
+            await LoadRequestsAsync();
         }
 
         public async Task LoadRequestsAsync()
