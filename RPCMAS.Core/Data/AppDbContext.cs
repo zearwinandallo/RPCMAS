@@ -24,10 +24,10 @@ namespace RPCMAS.Core.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PriceChangeRequestDetailModel>()
-                .HasOne(d => d.PriceChangeRequestHeader)
-                .WithMany(h => h.Details)
-                .HasForeignKey("PriceChangeRequestHeaderId")
-                .OnDelete(DeleteBehavior.Cascade);
+            .HasOne<PriceChangeRequestHeaderModel>()
+            .WithMany(header => header.Details)
+            .HasForeignKey(d => d.PriceChangeRequestHeaderId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

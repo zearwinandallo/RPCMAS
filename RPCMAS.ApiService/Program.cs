@@ -23,9 +23,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Services
 builder.Services.AddScoped<IItemCatalogService, ItemCatalogService>();
+builder.Services.AddScoped<IPriceChangeRequestService, PriceChangeRequestService>();
 
 //Repositories
 builder.Services.AddScoped<IItemCatalogRepository, ItemCatalogRepository>();
+builder.Services.AddScoped<IPriceChangeRequestRepository, PriceChangeRequestRepository>();
 
 
 // Add services to the container.

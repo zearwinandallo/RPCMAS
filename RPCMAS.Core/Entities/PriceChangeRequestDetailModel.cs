@@ -22,6 +22,6 @@ namespace RPCMAS.Core.Entities
 
         public string Remarks { get; set; }
 
-        public PriceChangeRequestHeaderModel PriceChangeRequestHeader { get; set; }
+        public Guid PriceChangeRequestHeaderId { get; set; }
     }
 }
