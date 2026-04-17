@@ -22,9 +22,10 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         public string? selectedChangeType { get; set; }
         public string? requestDateText { get; set; }
         public string errorMessage { get; set; } = string.Empty;
-        public string statusMessage { get; set; } = string.Empty;
+        public string successNotificationMessage { get; set; } = string.Empty;
         public bool isLoading { get; set; } = true;
         public bool isActionRunning { get; set; }
+        private int successNotificationVersion { get; set; }
 
         protected IReadOnlyList<RequestStatusEnum> requestStatuses { get; } = Enum.GetValues<RequestStatusEnum>();
         protected IReadOnlyList<ChangeTypeEnum> changeTypes { get; } = Enum.GetValues<ChangeTypeEnum>();
@@ -46,7 +47,6 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             isLoading = true;
             errorMessage = string.Empty;
-            statusMessage = string.Empty;
 
             ApplyFilterSelections();
 
@@ -117,14 +117,13 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             isActionRunning = true;
             errorMessage = string.Empty;
-            statusMessage = string.Empty;
 
             var response = await ApiClient.PostAsync<BaseResponseModel, object>($"/api/PriceChangeRequest/{id}/{action}", new { });
 
             if (response != null && response.IsSuccess)
             {
-                statusMessage = successMessage;
                 await LoadRequestsAsync();
+                await ShowSuccessNotificationAsync(successMessage);
             }
             else
             {
@@ -173,6 +172,20 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             return values.Count == 0
                 ? "/api/PriceChangeRequest"
                 : $"/api/PriceChangeRequest?{string.Join("&", values)}";
+        }
+
+        private async Task ShowSuccessNotificationAsync(string message)
+        {
+            successNotificationMessage = message;
+            var currentVersion = ++successNotificationVersion;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(2500);
+
+            if (currentVersion == successNotificationVersion)
+            {
+                successNotificationMessage = string.Empty;
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
         private static string GetChangeTypeLabel(ChangeTypeEnum changeType)

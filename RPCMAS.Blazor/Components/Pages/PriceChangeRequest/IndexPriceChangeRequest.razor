@@ -5,6 +5,13 @@
 <PageTitle>Price Change Requests</PageTitle>
 
 <div class="container-fluid py-3">
+    @if (!string.IsNullOrWhiteSpace(successNotificationMessage))
+    {
+        <div class="simple-success-toast shadow-sm">
+            <span class="bi bi-check-circle-fill me-2" aria-hidden="true"></span>@successNotificationMessage
+        </div>
+    }
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
             <h1 class="h3 mb-1">Price Change Requests</h1>
@@ -16,11 +23,6 @@
             </button>
         </div>
     </div>
-
-    @if (!string.IsNullOrWhiteSpace(statusMessage))
-    {
-        <div class="alert alert-success">@statusMessage</div>
-    }
 
     @if (!string.IsNullOrWhiteSpace(errorMessage))
     {
@@ -142,6 +144,22 @@
 </div>
 
 <style>
+    .simple-success-toast {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1080;
+        display: inline-flex;
+        align-items: center;
+        max-width: 360px;
+        padding: 0.85rem 1rem;
+        border: 1px solid #b9e7c9;
+        border-radius: 14px;
+        background: #ecfdf3;
+        color: #166534;
+        font-weight: 600;
+    }
+
     .modern-request-table-card {
         border-radius: 18px;
         overflow: hidden;

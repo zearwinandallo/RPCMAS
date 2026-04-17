@@ -29,9 +29,10 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         public string? selectedChangeType { get; set; }
         public string? requestDateText { get; set; }
         public string errorMessage { get; set; } = string.Empty;
-        public string statusMessage { get; set; } = string.Empty;
+        public string successNotificationMessage { get; set; } = string.Empty;
         public bool isLoading { get; set; } = true;
         public bool isActionRunning { get; set; }
+        private int successNotificationVersion { get; set; }
 
         public bool showModal { get; set; }
         public bool isModalLoading { get; set; }
@@ -85,7 +86,6 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             isLoading = true;
             errorMessage = string.Empty;
-            statusMessage = string.Empty;
 
             ApplyFilterSelections();
 
@@ -131,14 +131,13 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             isActionRunning = true;
             errorMessage = string.Empty;
-            statusMessage = string.Empty;
 
             var response = await ApiClient.PostAsync<BaseResponseModel, object>($"/api/PriceChangeRequest/{id}/submit", new { });
 
             if (response != null && response.IsSuccess)
             {
-                statusMessage = "Request submitted successfully.";
                 await LoadRequestsAsync();
+                await ShowSuccessNotificationAsync("Request submitted successfully.");
             }
             else
             {
@@ -152,14 +151,13 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         {
             isActionRunning = true;
             errorMessage = string.Empty;
-            statusMessage = string.Empty;
 
             var response = await ApiClient.PostAsync<BaseResponseModel, object>($"/api/PriceChangeRequest/{id}/cancel", new { });
 
             if (response != null && response.IsSuccess)
             {
-                statusMessage = "Request cancelled successfully.";
                 await LoadRequestsAsync();
+                await ShowSuccessNotificationAsync("Request cancelled successfully.");
             }
             else
             {
@@ -379,17 +377,14 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
                     isModalSaving = false;
                     return;
                 }
-
-                statusMessage = isEditingModal ? "Request updated and submitted successfully." : "Request created and submitted successfully.";
-            }
-            else
-            {
-                statusMessage = isEditingModal ? "Draft request updated successfully." : "Draft request created successfully.";
             }
 
             isModalSaving = false;
             CloseModal();
             await LoadRequestsAsync();
+            await ShowSuccessNotificationAsync(submitAfterSave
+                ? (isEditingModal ? "Request updated and submitted successfully." : "Request created and submitted successfully.")
+                : (isEditingModal ? "Draft request updated successfully." : "Draft request created successfully."));
         }
 
         private async Task LoadItemCatalogsAsync()
@@ -449,6 +444,20 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             return values.Count == 0
                 ? "/api/PriceChangeRequest"
                 : $"/api/PriceChangeRequest?{string.Join("&", values)}";
+        }
+
+        private async Task ShowSuccessNotificationAsync(string message)
+        {
+            successNotificationMessage = message;
+            var currentVersion = ++successNotificationVersion;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(2500);
+
+            if (currentVersion == successNotificationVersion)
+            {
+                successNotificationMessage = string.Empty;
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
         private bool ValidateModalRequest()
