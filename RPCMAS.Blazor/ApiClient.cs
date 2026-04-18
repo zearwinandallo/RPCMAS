@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Newtonsoft.Json;
 using RPCMAS.Blazor.Authentication;
 using RPCMAS.Core.Models;
@@ -84,11 +85,19 @@ public class ApiClient
     public async Task<T1?> PostAsync<T1, T2>(string path, T2 postModel)
     {
         await SetAuthorizeHeader();
-        var res = await _httpClient.PostAsJsonAsync(path, postModel);
-        if (res != null && res.IsSuccessStatusCode)
+        try
         {
-            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+            var res = await _httpClient.PostAsJsonAsync(path, postModel);
+            if (res.IsSuccessStatusCode)
+            {
+                return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+            }
         }
+        catch (HttpRequestException)
+        {
+            return default;
+        }
+
         return default;
     }
 

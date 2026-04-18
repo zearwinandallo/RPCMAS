@@ -20,9 +20,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://localhost:7378");
+        client.BaseAddress = new(Environment.GetEnvironmentVariable("API_BASE_URL") ?? "https+http://localhost:7420");
     });
 
 var app = builder.Build();

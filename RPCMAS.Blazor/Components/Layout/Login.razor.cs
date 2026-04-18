@@ -30,19 +30,28 @@ namespace RPCMAS.Blazor.Components.Layout
             isSubmitting = true;
             errorMessage = string.Empty;
 
-            var res = await ApiClient.PostAsync<LoginResponseModel, LoginModel>("/api/auth/login", loginModel);
-
-            if (res != null && !string.IsNullOrWhiteSpace(res.Token))
+            try
             {
-                await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res);
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                errorMessage = "Invalid username or password.";
-            }
+                var res = await ApiClient.PostAsync<LoginResponseModel, LoginModel>("/api/auth/login", loginModel);
 
-            isSubmitting = false;
+                if (res != null && !string.IsNullOrWhiteSpace(res.Token))
+                {
+                    await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(res);
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    errorMessage = "Invalid username or password, or the API is unreachable.";
+                }
+            }
+            catch (Exception)
+            {
+                errorMessage = "The login request failed. Please verify the API container is reachable and try again.";
+            }
+            finally
+            {
+                isSubmitting = false;
+            }
         }
     }
 }
