@@ -180,6 +180,8 @@ namespace RPCMAS.Infrastructure.Services
                 {
                     throw new Exception($"Item with SKU '{detail.SKU}' not found.");
                 }
+
+                item.CurrentPrice = detail.ProposedNewPrice;
             }
 
             request.Status = RequestStatusEnum.Applied;
