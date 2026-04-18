@@ -48,7 +48,7 @@
 
                             <div class="item-meta">
                                 <span>@item.Department</span>
-                                <strong>@item.CurrentPrice.ToString("C")</strong>
+                                <strong>@($"₱{item.CurrentPrice:N2}")</strong>
                             </div>
                         </button>
                     }
@@ -86,11 +86,11 @@
                 </div>
                 <div class="detail-row">
                     <span>Current Price</span>
-                    <strong>@(selectedItemCatalog != null ? selectedItemCatalog.CurrentPrice.ToString("C") : "-")</strong>
+                    <strong>@(selectedItemCatalog != null ? $"₱{selectedItemCatalog.CurrentPrice:N2}" : "-")</strong>
                 </div>
                 <div class="detail-row">
                     <span>Cost</span>
-                    <strong>@(selectedItemCatalog != null ? selectedItemCatalog.Cost.ToString("C") : "-")</strong>
+                    <strong>@(selectedItemCatalog != null ? $"₱{selectedItemCatalog.Cost:N2}" : "-")</strong>
                 </div>
                 <div class="detail-row">
                     <span>Status</span>

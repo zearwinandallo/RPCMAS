@@ -100,8 +100,8 @@
                                     <tr>
                                         <td>@detail.SKU</td>
                                         <td>@detail.ItemName</td>
-                                        <td>@detail.CurrentPrice.ToString("C")</td>
-                                        <td>@detail.ProposedNewPrice.ToString("C")</td>
+                                        <td>@($"₱{detail.CurrentPrice:N2}")</td>
+                                        <td>@($"₱{detail.ProposedNewPrice:N2}")</td>
                                         <td>@detail.MarkdownPercentage.ToString("0.00")</td>
                                         <td>@detail.EffectiveDate.ToString("yyyy-MM-dd")</td>
                                         <td>@detail.Remarks</td>
