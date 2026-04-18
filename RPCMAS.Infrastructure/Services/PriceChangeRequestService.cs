@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using RPCMAS.Core.Entities;
 using RPCMAS.Core.Interfaces;
 using RPCMAS.Core.Models;
@@ -7,15 +9,32 @@ namespace RPCMAS.Infrastructure.Services
     public class PriceChangeRequestService : IPriceChangeRequestService
     {
         private readonly IPriceChangeRequestRepository _priceChangeRequestRepository;
-
-        public PriceChangeRequestService(IPriceChangeRequestRepository priceChangeRequestRepository)
+        private readonly IDistributedCache _distributedCache;
+        public PriceChangeRequestService(
+            IPriceChangeRequestRepository priceChangeRequestRepository,
+            IDistributedCache distributedCache)
         {
             _priceChangeRequestRepository = priceChangeRequestRepository;
+            _distributedCache = distributedCache;
         }
 
-        public Task<List<PriceChangeRequestHeaderModel>> GetPriceChangeRequests(PriceChangeRequestFilter filter)
+        public async Task<List<PriceChangeRequestHeaderModel>> GetPriceChangeRequests(PriceChangeRequestFilter filter)
         {
-            return _priceChangeRequestRepository.GetPriceChangeRequests(filter);
+            if (HasFilter(filter))
+            {
+                return await _priceChangeRequestRepository.GetPriceChangeRequests(filter);
+            }
+
+            var cacheValue = await _distributedCache.GetStringAsync("list_request");
+
+            if (!string.IsNullOrEmpty(cacheValue))
+            {
+                return JsonConvert.DeserializeObject<List<PriceChangeRequestHeaderModel>>(cacheValue) ?? new List<PriceChangeRequestHeaderModel>();
+            }
+            var requests = await _priceChangeRequestRepository.GetPriceChangeRequests(filter);
+
+            await _distributedCache.SetStringAsync("list_request", JsonConvert.SerializeObject(requests));
+            return requests;
         }
 
         public async Task<PriceChangeRequestHeaderModel?> GetPriceChangeRequestById(Guid id)
@@ -51,6 +70,8 @@ namespace RPCMAS.Infrastructure.Services
             await _priceChangeRequestRepository.AddPriceChangeRequest(newRequest);
             await _priceChangeRequestRepository.SaveChanges();
 
+            await _distributedCache.RemoveAsync("list_request");
+
             return newRequest;
         }
 
@@ -77,6 +98,8 @@ namespace RPCMAS.Infrastructure.Services
 
             await _priceChangeRequestRepository.SaveChanges();
 
+            await _distributedCache.RemoveAsync("list_request");
+
             return await _priceChangeRequestRepository.GetPriceChangeRequestById(existingRequest.Id);
         }
 
@@ -95,6 +118,8 @@ namespace RPCMAS.Infrastructure.Services
             request.Status = RequestStatusEnum.Submitted;
             await _priceChangeRequestRepository.SaveChanges();
 
+            await _distributedCache.RemoveAsync("list_request");
+
             return request;
         }
 
@@ -112,6 +137,8 @@ namespace RPCMAS.Infrastructure.Services
             request.Status = RequestStatusEnum.Approved;
             await _priceChangeRequestRepository.SaveChanges();
 
+            await _distributedCache.RemoveAsync("list_request");
+
             return request;
         }
 
@@ -128,6 +155,8 @@ namespace RPCMAS.Infrastructure.Services
 
             request.Status = RequestStatusEnum.Rejected;
             await _priceChangeRequestRepository.SaveChanges();
+
+            await _distributedCache.RemoveAsync("list_request");
 
             return request;
         }
@@ -156,6 +185,9 @@ namespace RPCMAS.Infrastructure.Services
             request.Status = RequestStatusEnum.Applied;
             await _priceChangeRequestRepository.SaveChanges();
 
+            await _distributedCache.RemoveAsync("list_request");
+            await _distributedCache.RemoveAsync("list_itemCatalog");
+
             return request;
         }
 
@@ -172,6 +204,8 @@ namespace RPCMAS.Infrastructure.Services
 
             request.Status = RequestStatusEnum.Cancelled;
             await _priceChangeRequestRepository.SaveChanges();
+
+            await _distributedCache.RemoveAsync("list_request");
 
             return request;
         }
@@ -245,6 +279,15 @@ namespace RPCMAS.Infrastructure.Services
         private static string GenerateRequestNumber()
         {
             return $"PCR-{DateTime.Now:yyyyMMddHHmmssfff}";
+        }
+
+        private static bool HasFilter(PriceChangeRequestFilter filter)
+        {
+            return !string.IsNullOrWhiteSpace(filter.RequestNumber)
+                || filter.Status.HasValue
+                || !string.IsNullOrWhiteSpace(filter.Department)
+                || filter.ChangeType.HasValue
+                || filter.RequestDate.HasValue;
         }
 
        

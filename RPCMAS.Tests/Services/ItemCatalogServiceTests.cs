@@ -1,4 +1,5 @@
 using Moq;
+using Microsoft.Extensions.Caching.Distributed;
 using RPCMAS.Core.Entities;
 using RPCMAS.Core.Interfaces;
 using RPCMAS.Infrastructure.Services;
@@ -9,13 +10,15 @@ namespace RPCMAS.Tests.Services;
 public class ItemCatalogServiceTests
 {
     private Mock<IItemCatalogRepository> _repositoryMock = default!;
+    private Mock<IDistributedCache> _cacheMock = default!;
     private ItemCatalogService _service = default!;
 
     [SetUp]
     public void SetUp()
     {
         _repositoryMock = new Mock<IItemCatalogRepository>();
-        _service = new ItemCatalogService(_repositoryMock.Object);
+        _cacheMock = new Mock<IDistributedCache>();
+        _service = new ItemCatalogService(_repositoryMock.Object, _cacheMock.Object);
     }
 
     [Test]
@@ -41,6 +44,16 @@ public class ItemCatalogServiceTests
         await _service.GetItemCatalogs(null);
 
         _repositoryMock.Verify(x => x.GetItemCatalogs(null), Times.Once);
+    }
+
+    [Test]
+    public async Task GetItemCatalogs_WithFilter_DoesNotReadFromCache()
+    {
+        _repositoryMock.Setup(x => x.GetItemCatalogs("Shoes")).ReturnsAsync(new List<ItemCatalogModel>());
+
+        await _service.GetItemCatalogs("Shoes");
+
+        Assert.That(_cacheMock.Invocations, Is.Empty);
     }
 
     [Test]

@@ -70,6 +70,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorization();
 
+builder.AddKeyedRedisDistributedCache("cache");
+
 var app = builder.Build();
 
 await ItemCatalogSeeder.SeedAsync(app.Services);
