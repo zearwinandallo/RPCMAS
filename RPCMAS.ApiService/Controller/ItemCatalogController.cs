@@ -8,6 +8,7 @@ namespace RPCMAS.API.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ItemCatalogController : ControllerBase
     {
         private readonly IItemCatalogService _itemCatalogService;

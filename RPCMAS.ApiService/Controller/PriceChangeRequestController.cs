@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RPCMAS.Core.Entities;
 using RPCMAS.Core.Interfaces;
@@ -7,6 +8,7 @@ namespace RPCMAS.API.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PriceChangeRequestController : ControllerBase
     {
         private readonly IPriceChangeRequestService _priceChangeRequestService;
