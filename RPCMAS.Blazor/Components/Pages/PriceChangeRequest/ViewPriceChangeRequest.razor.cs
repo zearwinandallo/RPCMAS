@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using RPCMAS.Core.Entities;
 using RPCMAS.Core.Models;
@@ -14,6 +15,12 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
 
         [Inject]
         public ApiClient ApiClient { get; set; } = default!;
+
+        [Inject]
+        public IJSRuntime JSRuntime { get; set; } = default!;
+
+        [Inject]
+        public NavigationManager NavigationManager { get; set; } = default!;
 
         public PriceChangeRequestHeaderModel? requestModel { get; set; }
         public string errorMessage { get; set; } = string.Empty;
@@ -43,6 +50,18 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
             }
 
             isLoading = false;
+        }
+
+        protected async Task GoBackAsync()
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("history.back");
+            }
+            catch
+            {
+                NavigationManager.NavigateTo("/pricechangerequest", replace: true);
+            }
         }
 
         private static string GetChangeTypeLabel(ChangeTypeEnum changeType)
