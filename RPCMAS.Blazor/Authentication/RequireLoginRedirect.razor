@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter]
+    public string LoginPath { get; set; } = "/login";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+        var currentPath = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+
+        if (!isAuthenticated && !string.Equals(currentPath, LoginPath, StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo(LoginPath, replace: true);
+        }
+    }
+}
