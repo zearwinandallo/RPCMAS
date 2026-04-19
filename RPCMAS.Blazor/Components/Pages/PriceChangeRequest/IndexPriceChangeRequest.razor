@@ -219,21 +219,6 @@
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
-                    @if (modalValidationMessages.Any())
-                    {
-                        <div class="alert alert-danger">
-                            @foreach (var message in modalValidationMessages)
-                            {
-                                <div>@message</div>
-                            }
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(modalErrorMessage))
-                    {
-                        <div class="alert alert-danger">@modalErrorMessage</div>
-                    }
-
                     @if (isModalLoading)
                     {
                         <div>Loading request...</div>
@@ -377,6 +362,21 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if (modalValidationMessages.Any())
+                        {
+                            <div class="alert alert-danger mt-3 mb-0">
+                                @foreach (var message in modalValidationMessages)
+                                {
+                                    <div>@message</div>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(modalErrorMessage))
+                        {
+                            <div class="alert alert-danger mt-3 mb-0">@modalErrorMessage</div>
+                        }
                     }
                 </div>
                 <div class="modal-footer">
