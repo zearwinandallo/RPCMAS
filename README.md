@@ -15,7 +15,7 @@ KCCC Take Home Exam
 docker compose up -d
 ```
 
-This assumes a `docker-compose.yml` (or `docker-compose.yaml`) is present in your solution root that defines the services you want to start.
+A `docker-compose.yml` (or `docker-compose.yaml`) is present in the solution root that defines the services you want to start.
 
 > **Security note:** The `SA_PASSWORD` above is an example. Use a strong, unique password in production.
 
