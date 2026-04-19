@@ -268,15 +268,21 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
                 return Task.CompletedTask;
             }
 
+            modalErrorMessage = string.Empty;
+
+            if (IsDuplicateSku(detail))
+            {
+                ResetSelectedItem(detail);
+                modalErrorMessage = "This item has already been selected.";
+                StateHasChanged();
+                return Task.CompletedTask;
+            }
+
             var item = itemCatalogs.FirstOrDefault(x => x.SKU == detail.SKU);
 
             if (item == null)
             {
-                detail.SKU = string.Empty;
-                detail.ItemName = string.Empty;
-                detail.CurrentPrice = 0;
-                detail.ProposedNewPrice = 0;
-                detail.MarkdownPercentage = 0;
+                ResetSelectedItem(detail);
                 StateHasChanged();
                 return Task.CompletedTask;
             }
@@ -487,6 +493,8 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
                 return false;
             }
 
+            var seenSkus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             if (isEditingModal && modalRequestModel.Status != RequestStatusEnum.Draft)
             {
                 modalValidationMessages.Add("Only Draft requests can be edited.");
@@ -517,6 +525,10 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
                 if (string.IsNullOrWhiteSpace(detail.value.SKU))
                 {
                     modalValidationMessages.Add($"Row {detail.index + 1}: Item is required.");
+                }
+                else if (!seenSkus.Add(detail.value.SKU))
+                {
+                    modalValidationMessages.Add($"Row {detail.index + 1}: Item is duplicated.");
                 }
 
                 if (detail.value.ProposedNewPrice <= 0)
@@ -553,6 +565,22 @@ namespace RPCMAS.Blazor.Components.Pages.PriceChangeRequest
         private void UpdateMarkdownPercentage(PriceChangeRequestDetailModel detail)
         {
             detail.MarkdownPercentage = GetMarkdownPercentage(detail.CurrentPrice, detail.ProposedNewPrice);
+        }
+
+        private bool IsDuplicateSku(PriceChangeRequestDetailModel detail)
+        {
+            return modalRequestModel?.Details.Any(x =>
+                !ReferenceEquals(x, detail) &&
+                string.Equals(x.SKU, detail.SKU, StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        private static void ResetSelectedItem(PriceChangeRequestDetailModel detail)
+        {
+            detail.SKU = string.Empty;
+            detail.ItemName = string.Empty;
+            detail.CurrentPrice = 0;
+            detail.ProposedNewPrice = 0;
+            detail.MarkdownPercentage = 0;
         }
 
         private void ClearQueryString()
