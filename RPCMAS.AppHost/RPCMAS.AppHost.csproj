@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RPCMAS.ApiService\RPCMAS.API.csproj" />
+    <ProjectReference Include="..\RPCMAS.API\RPCMAS.API.csproj" />
     <ProjectReference Include="..\RPCMAS.Blazor\RPCMAS.Blazor.csproj" />
   </ItemGroup>
 

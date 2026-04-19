@@ -1,7 +1,7 @@
 services:
   apiservice:
     build:
-      dockerfile: RPCMAS.ApiService/Dockerfile
+      dockerfile: RPCMAS.API/Dockerfile
     ports:
       - "5001:8080"
     environment:

@@ -9,13 +9,13 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["RPCMAS.ApiService/RPCMAS.API.csproj", "RPCMAS.ApiService/"]
+COPY ["RPCMAS.API/RPCMAS.API.csproj", "RPCMAS.API/"]
 COPY ["RPCMAS.Core/RPCMAS.Core.csproj", "RPCMAS.Core/"]
 COPY ["RPCMAS.Infrastructure/RPCMAS.Infrastructure.csproj", "RPCMAS.Infrastructure/"]
 COPY ["RPCMAS.ServiceDefaults/RPCMAS.ServiceDefaults.csproj", "RPCMAS.ServiceDefaults/"]
-RUN dotnet restore "./RPCMAS.ApiService/RPCMAS.API.csproj"
+RUN dotnet restore "./RPCMAS.API/RPCMAS.API.csproj"
 COPY . .
-WORKDIR "/src/RPCMAS.ApiService"
+WORKDIR "/src/RPCMAS.API"
 RUN dotnet build "./RPCMAS.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
