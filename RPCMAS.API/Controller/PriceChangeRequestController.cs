@@ -125,18 +125,21 @@ namespace RPCMAS.API.Controller
         }
 
         [HttpPost("{id:guid}/approve")]
+        [Authorize(Roles = nameof(UserRoleEnum.StoreManager))]
         public async Task<ActionResult<BaseResponseModel>> ApproveRequest(Guid id)
         {
             return Ok(await ChangeStatus(id, _priceChangeRequestService.ApproveRequest));
         }
 
         [HttpPost("{id:guid}/reject")]
+        [Authorize(Roles = nameof(UserRoleEnum.StoreManager))]
         public async Task<ActionResult<BaseResponseModel>> RejectRequest(Guid id)
         {
             return Ok(await ChangeStatus(id, _priceChangeRequestService.RejectRequest));
         }
 
         [HttpPost("{id:guid}/apply")]
+        [Authorize(Roles = nameof(UserRoleEnum.StoreManager))]
         public async Task<ActionResult<BaseResponseModel>> ApplyRequest(Guid id)
         {
             return Ok(await ChangeStatus(id, _priceChangeRequestService.ApplyRequest));
