@@ -17,8 +17,51 @@ docker compose up -d
 
 A `docker-compose.yaml` is present in the solution root that defines the services you want to start.
 
-> **Security note:** The `SA_PASSWORD` above is an example. Use a strong, unique password in production.
+---
+
+# Item Catalog Access & Role Permissions
+
+## Overview
+All roles have access to the **Item Catalog**, but their permissions differ based on their assigned role.
 
 ---
+
+## Role Permissions
+
+### 1. Department Supervisor
+- ✅ Access Item Catalog  
+- ✅ Submit Requests  
+
+---
+
+### 2. Merchant Manager
+- ✅ Access Item Catalog  
+- ✅ Submit Requests  
+- ✅ View Approval Request List  
+- ✅ View Approval History  
+
+- ❌ Cannot Approve Requests  
+- ❌ Cannot Reject Requests  
+- ❌ Cannot Apply Requests  
+
+---
+
+### 3. Store Manager
+- ✅ View Approval Request List  
+- ✅ View Approval History  
+
+- ✅ Can Approve Requests  
+- ✅ Can Reject Requests  
+- ✅ Can Apply Requests  
+
+---
+
+## Summary
+
+| Role                  | Submit Request | View Approval List | View History | Approve/Reject/Apply |
+|----------------------|--------------|--------------------|--------------|----------------------|
+| Department Supervisor| ✅ Yes        | ❌ No              | ❌ No        | ❌ No                |
+| Merchant Manager     | ✅ Yes        | ✅ Yes             | ✅ Yes       | ❌ No                |
+| Store Manager        | ❌ No         | ✅ Yes             | ✅ Yes       | ✅ Yes               |
 
 
