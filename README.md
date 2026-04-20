@@ -1,21 +1,44 @@
 # RPCMAS
 KCCC Take Home Exam
-
 # Add MSSQL Docker
 
-## Docker
+## Steps
 
-**Terminal:**
+1. Pull the MSSQL Docker image:
+   ```bash
+   docker pull mcr.microsoft.com/mssql/server:2022-latest
+   ```
 
-1. `docker pull mcr.microsoft.com/mssql/server:2022-latest`
-2. `docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=123qweASD!' -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest`
-3. In solution, go to **Terminal** and run:
+2. Run the SQL Server container:
+   ```bash
+   docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=123qweASD!" -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
+   ```
 
-```bash
-docker compose up -d
-```
+3. After adding MSSQL Docker, update your connection strings based on your local setup:
 
-A `docker-compose.yaml` is present in the solution root that defines the services you want to start.
+   - In `appsettings.json`:
+     ```json
+     "ConnectionStrings": {
+       "DefaultConnection": "Server=localhost,1433;Database=YourDb;User Id=sa;Password=123qweASD!;TrustServerCertificate=True;"
+     }
+     ```
+
+   - In `docker-compose.yaml`:
+     ```yaml
+     ConnectionStrings__DefaultConnection: "Server=host.docker.internal,1433;Database=YourDb;User Id=sa;Password=123qweASD!;TrustServerCertificate=True;"
+     ```
+
+## Notes
+
+- Use `localhost,1433` for local machine connections.
+- Use `host.docker.internal,1433` for container-to-container connections.
+- Ensure credentials and database name match your configuration.
+
+
+4. In your solution, open **Terminal** and run:
+   ```bash
+   docker compose up -d
+   ```
 
 ---
 
